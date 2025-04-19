@@ -6,7 +6,7 @@ function getParentTaskTextReadMode(taskElement: Element): string {
 	const childLists = clone.querySelectorAll('ul');
 	childLists.forEach(list => list.remove());
 
-	// Remove the progress bar
+	// Remove the progress bar 
 	const progressBar = clone.querySelector('.cm-task-progress-bar');
 	if (progressBar) progressBar.remove();
 
