@@ -1014,16 +1014,16 @@ class ProgressBar extends Component {
 
 				} else if (status === "inProgress") {
 					if (!useTaskGoal) inProgress++
-					if (subTaskGoal !== null) inProgress += subTaskGoal
+					if (useTaskGoal && subTaskGoal !== null) inProgress += subTaskGoal
 				} else if (status === "abandoned") {
 					if (!useTaskGoal) abandoned++
-					if (subTaskGoal !== null) abandoned += subTaskGoal
+					if (useTaskGoal && subTaskGoal !== null) abandoned += subTaskGoal
 				} else if (status === "planned") {
 					if (!useTaskGoal) planned++
-					if (subTaskGoal !== null) planned += subTaskGoal
+					if (useTaskGoal && subTaskGoal !== null) planned += subTaskGoal
 				} else if (status === "notStarted") {
 					if (!useTaskGoal) notStarted++
-					if (subTaskGoal !== null) notStarted += subTaskGoal
+					if (useTaskGoal && subTaskGoal !== null) notStarted += subTaskGoal
 				}
 			} else {
 				// Fallback to the text content method
