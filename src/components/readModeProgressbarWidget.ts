@@ -8,6 +8,7 @@ import {
 } from "obsidian";
 import { shouldHideProgressBarInPreview } from "../utils";
 import { formatProgressText } from "../editor-ext/progressBarWidget";
+import { checkIfIsParentTaskReadMode, checkIfParentElementHasGoalFormat, extractTaskAndGoalInfoReadMode, getCustomGoalReadMode, getParentGoalReadMode } from "src/utils/goal/readMode";
 
 interface GroupElement {
 	parentElement: HTMLElement;
@@ -26,14 +27,17 @@ function groupElementsByParent(childrenElements: HTMLElement[]) {
 			} else {
 				parentMap.set(parent, [child]);
 			}
-		}
+		} 
+		const customGoal = getParentGoalReadMode(child); // [CustomGoalFeature]
+		child.setAttribute("data-custom-goal", String(getParentGoalReadMode(child))); // [CustomGoalFeature]
+		// console.warn("Custom Goal", customGoal); // [CustomGoalFeature]
 	});
 
 	const result: GroupElement[] = [];
 	parentMap.forEach((children, parent) => {
-		result.push({ parentElement: parent, childrenElement: children });
+		result.push({ parentElement: parent, childrenElement: children});
 	});
-
+	// console.warn("Grouped", result);
 	return result;
 }
 
@@ -979,7 +983,6 @@ class ProgressBar extends Component {
 		this.notStarted = notStarted;
 		this.total = total;
 	}
-
 	countTasks(allTasks: HTMLElement[]) {
 		let completed = 0;
 		let inProgress = 0;
@@ -987,8 +990,12 @@ class ProgressBar extends Component {
 		let planned = 0;
 		let notStarted = 0;
 		let total = 0;
+		
 
 		for (let element of allTasks) {
+			// const isParentCustomGoal: boolean = checkIfParentElementHasGoalFormat(element.parentElement)
+			let subTaskGoal: null | number = null
+			const useTaskGoal: boolean = this.plugin?.settings.allowCustomProgressGoal && checkIfParentElementHasGoalFormat(element.parentElement)
 			const checkboxElement = element.querySelector(
 				".task-list-item-checkbox"
 			);
@@ -999,16 +1006,24 @@ class ProgressBar extends Component {
 			if (dataTask) {
 				const status = this.getTaskStatusFromDataTask(dataTask);
 
+				if(useTaskGoal) subTaskGoal = extractTaskAndGoalInfoReadMode(element)
+				
 				if (this.isCompletedTaskFromDataTask(dataTask)) {
-					completed++;
+					if (!useTaskGoal) completed++
+					if (subTaskGoal !== null) completed += subTaskGoal
+
 				} else if (status === "inProgress") {
-					inProgress++;
+					if (!useTaskGoal) inProgress++
+					if (subTaskGoal !== null) inProgress += subTaskGoal
 				} else if (status === "abandoned") {
-					abandoned++;
+					if (!useTaskGoal) abandoned++
+					if (subTaskGoal !== null) abandoned += subTaskGoal
 				} else if (status === "planned") {
-					planned++;
+					if (!useTaskGoal) planned++
+					if (subTaskGoal !== null) planned += subTaskGoal
 				} else if (status === "notStarted") {
-					notStarted++;
+					if (!useTaskGoal) notStarted++
+					if (subTaskGoal !== null) notStarted += subTaskGoal
 				}
 			} else {
 				// Fallback to the text content method
@@ -1067,6 +1082,9 @@ class ProgressBar extends Component {
 			const checkboxElement = element.querySelector(
 				".task-list-item-checkbox"
 			);
+			// console.warn("Child Element", element) // [CustomGoalFeature] Child Element
+			// Get the parent of the current element
+
 			if (!checkboxElement) continue;
 
 			allTasks.push(element);
@@ -1103,8 +1121,12 @@ class ProgressBar extends Component {
 					allTasks.push(child);
 				}
 			}
+			const parentGoal = getCustomGoalReadMode(element.parentElement?.parentElement);
+			// console.warn("Parent Goal Element", parentGoal) // [CustomGoalFeature] Parent Element
+			if (parentGoal) total = parentGoal
+			else total++;
 
-			total++;
+			// total++;
 		}
 
 		const { completed, inProgress, abandoned, planned, notStarted } =
