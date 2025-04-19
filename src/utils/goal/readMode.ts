@@ -38,32 +38,7 @@ export function extractTaskAndGoalInfoReadMode(taskElement: Element | null): num
 	// Check for goal in g::number or goal::number format
 	return extractTaskSpecificGoal(taskText);
 }
-
-export function checkIfIsParentTaskReadMode(taskElement: Element): boolean {
-	// Check if the task element has any child lists (subtasks)
-	const childLists = taskElement.querySelectorAll('ul');
-	return childLists.length > 0;
-}
-
-export function getParentGoalReadMode(taskElement: Element): number | null {
-	if (!taskElement) return null;
-
-	if (checkIfIsParentTaskReadMode(taskElement)) {
-		const taskText = getParentTaskTextReadMode(taskElement);
-		if (!taskText) return null;
-		// Check for goal in g::number or goal::number format
-		return extractTaskSpecificGoal(taskText);
-	}
-	return null;
-	// // Get the text content of the task
-	// const taskText = getParentTaskTextReadMode(taskElement);
-	// if (!taskText) return null;
-	// console.log("extractTaskAndGoalInfoReadMode", extractTaskAndGoalInfoReadMode(taskElement));
-	// // Check for goal in g::number or goal::number format
-	// return extractTaskSpecificGoal(taskText);
-}
-
-export function getCustomGoalReadMode(taskElement: HTMLElement | null | undefined): number | null {
+export function getCustomTotalGoalReadMode(taskElement: HTMLElement | null | undefined): number | null {
 	if (!taskElement) return null;
 
 	// First check if the element already has a data-custom-goal attribute

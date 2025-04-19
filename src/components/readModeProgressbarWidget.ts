@@ -8,7 +8,7 @@ import {
 } from "obsidian";
 import { shouldHideProgressBarInPreview } from "../utils";
 import { formatProgressText } from "../editor-ext/progressBarWidget";
-import { checkIfIsParentTaskReadMode, checkIfParentElementHasGoalFormat, extractTaskAndGoalInfoReadMode, getCustomGoalReadMode, getParentGoalReadMode } from "src/utils/goal/readMode";
+import { checkIfParentElementHasGoalFormat, extractTaskAndGoalInfoReadMode, getCustomTotalGoalReadMode } from "src/utils/goal/readMode";
 
 interface GroupElement {
 	parentElement: HTMLElement;
@@ -28,9 +28,6 @@ function groupElementsByParent(childrenElements: HTMLElement[]) {
 				parentMap.set(parent, [child]);
 			}
 		} 
-		const customGoal = getParentGoalReadMode(child); // [CustomGoalFeature]
-		child.setAttribute("data-custom-goal", String(getParentGoalReadMode(child))); // [CustomGoalFeature]
-		// console.warn("Custom Goal", customGoal); // [CustomGoalFeature]
 	});
 
 	const result: GroupElement[] = [];
@@ -1121,7 +1118,7 @@ class ProgressBar extends Component {
 					allTasks.push(child);
 				}
 			}
-			const parentGoal = getCustomGoalReadMode(element.parentElement?.parentElement);
+			const parentGoal = getCustomTotalGoalReadMode(element.parentElement?.parentElement);
 			// console.warn("Parent Goal Element", parentGoal) // [CustomGoalFeature] Parent Element
 			if (parentGoal) total = parentGoal
 			else total++;
